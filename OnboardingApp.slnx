@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/server/">
+    <Project Path="server/OnboardingApp.Api.csproj" />
+  </Folder>
+</Solution>
