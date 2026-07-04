@@ -1,37 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useThemeToggle } from '../hooks/useThemeToggle'
 
 export function ThemeToggle() {
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    try {
-      const saved = localStorage.getItem('meridian_theme')
-      if (saved === 'dark') return true
-      if (saved === 'light') return false
-      return window.matchMedia('(prefers-color-scheme: dark)').matches
-    } catch {
-      return false
-    }
-  })
-
-  useEffect(() => {
-    const root = window.document.documentElement
-    if (isDark) {
-      root.classList.add('dark')
-      try {
-        localStorage.setItem('meridian_theme', 'dark')
-      } catch {}
-    } else {
-      root.classList.remove('dark')
-      try {
-        localStorage.setItem('meridian_theme', 'light')
-      } catch {}
-    }
-  }, [isDark])
+  const { isDark, toggle } = useThemeToggle()
 
   return (
     <button
-      onClick={() => setIsDark(!isDark)}
-      className="p-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-800 transition duration-150 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800/80 dark:text-slate-400 dark:hover:text-slate-200 cursor-pointer"
+      onClick={toggle}
+      className="p-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-800 transition duration-150 focus-ring dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800/80 dark:text-slate-400 dark:hover:text-slate-200 cursor-pointer"
       aria-label="Toggle dark mode"
+      aria-pressed={isDark}
     >
       {isDark ? (
         // Sun icon (switching to light mode)

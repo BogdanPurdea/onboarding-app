@@ -9,11 +9,11 @@ export function OnboardingTaskItem({
 }: OnboardingTaskItemProps) {
   return (
     <div
-      className={`p-5 border rounded-xl bg-white shadow-sm transition duration-200 flex items-start gap-4 ${!isUnlocked
+      className={`p-5 card-base transition duration-200 flex items-start gap-4 ${!isUnlocked
           ? 'border-slate-100 bg-slate-50/50 opacity-60 dark:border-slate-900/40 dark:bg-slate-950/20'
           : isCompleted
             ? 'border-emerald-200 bg-emerald-50/10 dark:border-emerald-950/40 dark:bg-emerald-950/5'
-            : 'border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900/50 dark:hover:border-slate-700'
+            : 'hover:border-slate-300 dark:hover:border-slate-700'
         }`}
     >
       {/* Checkbox wrapper */}

@@ -6,7 +6,7 @@ export function OnboardingProgressHeader({
   progressPercent
 }: OnboardingProgressHeaderProps) {
   return (
-    <div className="p-6 border border-slate-200 rounded-xl bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
+    <div className="p-6 card-base">
       <div className="flex items-center justify-between">
         <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">
           Overall Completion

@@ -8,3 +8,11 @@
   --color-surface: oklch(0.98 0.005 250);  /* near-white cool surface */
   --font-family-sans: 'Inter', system-ui, sans-serif;
 }
+
+@utility card-base {
+  @apply border border-slate-200 rounded-xl bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900/50;
+}
+
+@utility focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2;
+}
