@@ -8,7 +8,7 @@ interface OnboardingChecklistProps {
 export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
   const [tasks, setTasks] = useState<TaskDto[]>([])
   const [completedIds, setCompletedIds] = useState<number[]>([])
-  const [activePhase, setActivePhase] = useState<number>(0) // 0 = DayOne, 1 = WeekOne, 2 = MonthOne
+  const [activePhase, setActivePhase] = useState<number>(1) // 1 = WeekOne, 2 = WeekTwo, 3 = WeekThree, 4 = WeekFour
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -118,7 +118,7 @@ export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
 
   // Group tasks by timeline phase
   const phaseGroupedTasks = useMemo(() => {
-    const groups: { [key: number]: TaskDto[] } = { 0: [], 1: [], 2: [] }
+    const groups: { [key: number]: TaskDto[] } = { 1: [], 2: [], 3: [], 4: [] }
     tasks.forEach(t => {
       if (groups[t.timelinePhase] !== undefined) {
         groups[t.timelinePhase].push(t)
@@ -135,14 +135,17 @@ export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
   // Phase-specific statistics
   const phaseStats = useMemo(() => {
     const stats: { [key: number]: { total: number; completed: number } } = {
-      0: { total: 0, completed: 0 },
       1: { total: 0, completed: 0 },
-      2: { total: 0, completed: 0 }
+      2: { total: 0, completed: 0 },
+      3: { total: 0, completed: 0 },
+      4: { total: 0, completed: 0 }
     }
     tasks.forEach(t => {
-      stats[t.timelinePhase].total += 1
-      if (completedSet.has(t.id)) {
-        stats[t.timelinePhase].completed += 1
+      if (stats[t.timelinePhase]) {
+        stats[t.timelinePhase].total += 1
+        if (completedSet.has(t.id)) {
+          stats[t.timelinePhase].completed += 1
+        }
       }
     })
     return stats
@@ -191,11 +194,12 @@ export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
       {/* Phase Tabs Selector */}
       <div className="flex space-x-1 border-b border-slate-200">
         {[
-          { key: 0, label: 'Day 1' },
           { key: 1, label: 'Week 1' },
-          { key: 2, label: 'Month 1' }
+          { key: 2, label: 'Week 2' },
+          { key: 3, label: 'Week 3' },
+          { key: 4, label: 'Week 4' }
         ].map(phase => {
-          const stats = phaseStats[phase.key]
+          const stats = phaseStats[phase.key] || { total: 0, completed: 0 }
           const isCurrent = activePhase === phase.key
           return (
             <button
