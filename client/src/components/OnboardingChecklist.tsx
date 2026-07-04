@@ -1,5 +1,8 @@
 import { useState, useEffect, useMemo } from 'react'
 import type { TaskDto } from '../types'
+import { OnboardingProgressHeader } from './OnboardingProgressHeader'
+import { OnboardingPhaseTabs } from './OnboardingPhaseTabs'
+import { OnboardingTaskItem } from './OnboardingTaskItem'
 
 interface OnboardingChecklistProps {
   role: string
@@ -173,54 +176,19 @@ export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
 
   return (
     <div className="space-y-6 py-4">
-      {/* Progress Header Card */}
-      <div className="p-6 border border-slate-200 rounded-xl bg-white shadow-sm">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-semibold text-slate-500">
-            Overall Completion
-          </span>
-          <span className="text-sm font-bold text-indigo-600">
-            {totalCompletedCount} / {totalTasksCount} tasks ({progressPercent}%)
-          </span>
-        </div>
-        <div className="mt-3 w-full bg-slate-100 rounded-full h-2">
-          <div
-            className="bg-indigo-600 h-2 rounded-full transition-all duration-300 ease-out"
-            style={{ width: `${progressPercent}%` }}
-          />
-        </div>
-      </div>
+      {/* Progress Header */}
+      <OnboardingProgressHeader
+        completedCount={totalCompletedCount}
+        totalCount={totalTasksCount}
+        progressPercent={progressPercent}
+      />
 
-      {/* Phase Tabs Selector */}
-      <div className="flex space-x-1 border-b border-slate-200">
-        {[
-          { key: 1, label: 'Week 1' },
-          { key: 2, label: 'Week 2' },
-          { key: 3, label: 'Week 3' },
-          { key: 4, label: 'Week 4' }
-        ].map(phase => {
-          const stats = phaseStats[phase.key] || { total: 0, completed: 0 }
-          const isCurrent = activePhase === phase.key
-          return (
-            <button
-              key={phase.key}
-              onClick={() => setActivePhase(phase.key)}
-              className={`flex-1 pb-3 text-sm font-semibold transition-colors duration-200 border-b-2 focus:outline-none ${
-                isCurrent
-                  ? 'border-indigo-600 text-indigo-600'
-                  : 'border-transparent text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              <span>{phase.label}</span>
-              <span className={`ml-2 text-xs px-2 py-0.5 rounded-full ${
-                isCurrent ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-600'
-              }`}>
-                {stats.completed}/{stats.total}
-              </span>
-            </button>
-          )
-        })}
-      </div>
+      {/* Phase Tabs */}
+      <OnboardingPhaseTabs
+        activePhase={activePhase}
+        onChangePhase={setActivePhase}
+        phaseStats={phaseStats}
+      />
 
       {/* Task List */}
       <div className="space-y-4">
@@ -232,67 +200,18 @@ export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
           activePhaseTasks.map(task => {
             const isCompleted = completedSet.has(task.id)
             const isUnlocked = isTaskUnlocked(task)
+            const prerequisiteTitles = task.prerequisiteTaskIds
+              .map(preId => taskTitleMap.get(preId) || `Task #${preId}`)
 
             return (
-              <div
+              <OnboardingTaskItem
                 key={task.id}
-                className={`p-5 border rounded-xl bg-white shadow-sm transition duration-200 flex items-start gap-4 ${
-                  !isUnlocked
-                    ? 'border-slate-100 bg-slate-50/50 opacity-60'
-                    : isCompleted
-                      ? 'border-emerald-200 bg-emerald-50/10'
-                      : 'border-slate-200 hover:border-slate-300'
-                }`}
-              >
-                {/* Checkbox wrapper */}
-                <div className="flex items-center h-6">
-                  <input
-                    type="checkbox"
-                    id={`task-${task.id}`}
-                    checked={isCompleted}
-                    disabled={!isUnlocked}
-                    onChange={() => handleToggleTask(task)}
-                    className={`h-5.5 w-5.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-150 ${
-                      !isUnlocked
-                        ? 'cursor-not-allowed text-slate-300 bg-slate-100'
-                        : 'cursor-pointer'
-                    }`}
-                  />
-                </div>
-
-                {/* Task Content */}
-                <div className="flex-1 min-w-0">
-                  <label
-                    htmlFor={`task-${task.id}`}
-                    className={`block text-base font-semibold leading-6 select-none ${
-                      !isUnlocked
-                        ? 'text-slate-400 cursor-not-allowed'
-                        : isCompleted
-                          ? 'text-slate-500 line-through'
-                          : 'text-slate-900 cursor-pointer'
-                    }`}
-                  >
-                    {task.title}
-                  </label>
-                  <p className={`mt-1 text-sm leading-relaxed ${
-                    isCompleted ? 'text-slate-400' : 'text-slate-600'
-                  }`}>
-                    {task.description}
-                  </p>
-
-                  {/* Prerequisites Locks Warning */}
-                  {!isUnlocked && task.prerequisiteTaskIds && (
-                    <div className="mt-3 flex items-center gap-1.5 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-100 rounded-md px-2.5 py-1.5 w-fit">
-                      <span>
-                        Requires:{' '}
-                        {task.prerequisiteTaskIds
-                          .map(preId => taskTitleMap.get(preId) || `Task #${preId}`)
-                          .join(', ')}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
+                task={task}
+                isCompleted={isCompleted}
+                isUnlocked={isUnlocked}
+                onToggle={() => handleToggleTask(task)}
+                prerequisiteTitles={prerequisiteTitles}
+              />
             )
           })
         )}
