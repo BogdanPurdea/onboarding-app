@@ -7,10 +7,10 @@ export function DepartmentSelector({ onSelectRole }: DepartmentSelectorProps) {
   return (
     <div className="py-6">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold tracking-tight text-slate-900">
+        <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
           Welcome to Meridian
         </h2>
-        <p className="mt-2 text-base text-slate-500">
+        <p className="mt-2 text-base text-slate-500 dark:text-slate-400">
           Select your team department to begin your first month onboarding checklist.
         </p>
       </div>

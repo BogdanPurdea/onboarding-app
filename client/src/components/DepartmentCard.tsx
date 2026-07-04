@@ -4,14 +4,14 @@ export function DepartmentCard({ dept, onSelectRole }: DepartmentCardProps) {
   return (
     <button
       onClick={() => onSelectRole(dept.roleKey)}
-      className="flex flex-col items-start p-5 text-left border border-slate-200 rounded-xl bg-white shadow-sm hover:border-indigo-500 hover:shadow-md transition duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 w-full group"
+      className="flex flex-col items-start p-5 text-left border border-slate-200 rounded-xl bg-white shadow-sm hover:border-indigo-500 hover:shadow-md transition duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 w-full group dark:border-slate-800 dark:bg-slate-900/50 dark:hover:border-indigo-500/50"
     >
       <div className="flex items-center justify-between w-full">
-        <span className="text-lg font-semibold text-slate-950 group-hover:text-indigo-600 transition-colors">
+        <span className="text-lg font-semibold text-slate-950 group-hover:text-indigo-600 transition-colors dark:text-slate-100 dark:group-hover:text-indigo-400">
           {dept.name}
         </span>
         <svg
-          className="w-5 h-5 text-slate-400 group-hover:text-indigo-500 transition-colors transform group-hover:translate-x-1"
+          className="w-5 h-5 text-slate-400 group-hover:text-indigo-500 transition-colors transform group-hover:translate-x-1 dark:text-slate-500 dark:group-hover:text-indigo-400"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -20,7 +20,7 @@ export function DepartmentCard({ dept, onSelectRole }: DepartmentCardProps) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
       </div>
-      <span className="mt-1 text-sm text-slate-500">
+      <span className="mt-1 text-sm text-slate-500 dark:text-slate-400">
         {dept.tagline}
       </span>
     </button>
