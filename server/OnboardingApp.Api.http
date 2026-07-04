@@ -1,6 +1,21 @@
 @OnboardingApp.Api_HostAddress = http://localhost:5245
 
-GET {{OnboardingApp.Api_HostAddress}}/weatherforecast/
+### Get Tasks by Department ID (Engineering = 1)
+GET {{OnboardingApp.Api_HostAddress}}/api/tasks?departmentId=1
 Accept: application/json
 
-###
+### Get Tasks by Role Name (Engineering - Case Insensitive)
+GET {{OnboardingApp.Api_HostAddress}}/api/tasks?role=eNgInEeRiNg
+Accept: application/json
+
+### Get Tasks by Role Name (Sales)
+GET {{OnboardingApp.Api_HostAddress}}/api/tasks?role=Sales
+Accept: application/json
+
+### Request with Missing Parameters (Expect 400 Bad Request)
+GET {{OnboardingApp.Api_HostAddress}}/api/tasks
+Accept: application/json
+
+### Request with Invalid Role (Expect 404 Not Found)
+GET {{OnboardingApp.Api_HostAddress}}/api/tasks?role=NonExistentRole
+Accept: application/json
