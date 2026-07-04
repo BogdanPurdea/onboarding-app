@@ -74,7 +74,7 @@ function App() {
           {selectedRole && (
             <button
               onClick={handleClearRole}
-              className="text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors dark:text-indigo-400 dark:hover:text-indigo-300 cursor-pointer"
+              className="text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors dark:text-orange-300 dark:hover:text-orange-400 cursor-pointer"
             >
               Change Role
             </button>
@@ -86,7 +86,7 @@ function App() {
       {selectedRole ? (
         <div className="py-2">
           <div className="mb-4">
-            <span className="inline-flex items-center rounded-md bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10 dark:bg-indigo-950/40 dark:text-indigo-300 dark:ring-indigo-500/20">
+            <span className="inline-flex items-center rounded-md bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10 dark:bg-orange-950/20 dark:text-orange-300 dark:ring-orange-400/20">
               {currentDept?.name} Onboarding Flow
             </span>
           </div>

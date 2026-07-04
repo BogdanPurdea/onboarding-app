@@ -7,11 +7,11 @@ export function DepartmentCard({ dept, onSelectRole }: DepartmentCardProps) {
       className="flex flex-col items-start p-5 text-left border border-slate-200 rounded-xl bg-white shadow-sm hover:border-indigo-500 hover:shadow-md transition duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 w-full group dark:border-slate-800 dark:bg-slate-900/50 dark:hover:border-indigo-500/50"
     >
       <div className="flex items-center justify-between w-full">
-        <span className="text-lg font-semibold text-slate-950 group-hover:text-indigo-600 transition-colors dark:text-slate-100 dark:group-hover:text-indigo-400">
+        <span className="text-lg font-semibold text-slate-950 group-hover:text-indigo-600 transition-colors dark:text-slate-100 dark:group-hover:text-orange-300">
           {dept.name}
         </span>
         <svg
-          className="w-5 h-5 text-slate-400 group-hover:text-indigo-500 transition-colors transform group-hover:translate-x-1 dark:text-slate-500 dark:group-hover:text-indigo-400"
+          className="w-5 h-5 text-slate-400 group-hover:text-indigo-500 transition-colors transform group-hover:translate-x-1 dark:text-slate-500 dark:group-hover:text-orange-300"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
