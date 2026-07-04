@@ -38,13 +38,24 @@ function App() {
 
   const handleSelectRole = (roleKey: string) => {
     setSelectedRole(roleKey)
-    const newUrl = roleKey ? `?role=${roleKey}` : window.location.pathname
+    const params = new URLSearchParams(window.location.search)
+    if (roleKey) {
+      params.set('role', roleKey)
+    } else {
+      params.delete('role')
+    }
+    const searchString = params.toString()
+    const newUrl = searchString ? `?${searchString}` : window.location.pathname
     window.history.pushState({ role: roleKey }, '', newUrl)
   }
 
   const handleClearRole = () => {
     setSelectedRole(null)
-    window.history.pushState({ role: null }, '', window.location.pathname)
+    const params = new URLSearchParams(window.location.search)
+    params.delete('role')
+    const searchString = params.toString()
+    const newUrl = searchString ? `?${searchString}` : window.location.pathname
+    window.history.pushState({ role: null }, '', newUrl)
   }
 
   // Look up resolved configuration

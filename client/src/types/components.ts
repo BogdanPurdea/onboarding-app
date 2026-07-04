@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import type { TaskDto, DepartmentConfig } from './index'
+import type { TaskDto, DepartmentConfig, TimelinePhase } from './index'
 
 export interface AppLayoutProps {
   children: ReactNode
@@ -25,9 +25,9 @@ export interface OnboardingProgressHeaderProps {
 }
 
 export interface OnboardingPhaseTabsProps {
-  activePhase: number
-  onChangePhase: (phase: number) => void
-  phaseStats: { [key: number]: { total: number; completed: number } }
+  activePhase: TimelinePhase
+  onChangePhase: (phase: TimelinePhase) => void
+  phaseStats: { [key in TimelinePhase]?: { total: number; completed: number } }
 }
 
 export interface OnboardingTaskItemProps {

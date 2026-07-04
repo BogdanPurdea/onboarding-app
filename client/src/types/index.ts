@@ -1,10 +1,19 @@
+export const TimelinePhase = {
+  WeekOne: 1,
+  WeekTwo: 2,
+  WeekThree: 3,
+  WeekFour: 4
+} as const;
+
+export type TimelinePhase = typeof TimelinePhase[keyof typeof TimelinePhase];
+
 export interface TaskDto {
   id: number
   departmentId: number
   departmentName: string
   title: string
   description: string
-  timelinePhase: number
+  timelinePhase: TimelinePhase
   displayOrder: number
   prerequisiteTaskIds: number[]
 }

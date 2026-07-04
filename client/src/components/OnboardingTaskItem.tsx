@@ -25,7 +25,7 @@ export function OnboardingTaskItem({
           checked={isCompleted}
           disabled={!isUnlocked}
           onChange={onToggle}
-          className={`h-5.5 w-5.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-150 ${
+          className={`h-5 w-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-150 ${
             !isUnlocked
               ? 'cursor-not-allowed text-slate-300 bg-slate-100'
               : 'cursor-pointer'

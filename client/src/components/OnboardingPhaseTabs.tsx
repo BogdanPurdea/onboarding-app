@@ -1,3 +1,4 @@
+import { TimelinePhase } from '../types/index'
 import type { OnboardingPhaseTabsProps } from '../types/components'
 
 export function OnboardingPhaseTabs({
@@ -6,10 +7,10 @@ export function OnboardingPhaseTabs({
   phaseStats
 }: OnboardingPhaseTabsProps) {
   const tabs = [
-    { key: 1, label: 'Week 1' },
-    { key: 2, label: 'Week 2' },
-    { key: 3, label: 'Week 3' },
-    { key: 4, label: 'Week 4' }
+    { key: TimelinePhase.WeekOne, label: 'Week 1' },
+    { key: TimelinePhase.WeekTwo, label: 'Week 2' },
+    { key: TimelinePhase.WeekThree, label: 'Week 3' },
+    { key: TimelinePhase.WeekFour, label: 'Week 4' }
   ]
 
   return (

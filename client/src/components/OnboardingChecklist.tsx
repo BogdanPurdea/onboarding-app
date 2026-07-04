@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import type { TaskDto } from '../types'
+import { TimelinePhase, type TaskDto } from '../types/index'
 import type { OnboardingChecklistProps } from '../types/components'
 import { isTaskUnlocked, computeCascadeUnchecks } from '../utils/checklistLogic'
 import { OnboardingProgressHeader } from './OnboardingProgressHeader'
@@ -9,18 +9,19 @@ import { OnboardingTaskItem } from './OnboardingTaskItem'
 export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
   const [tasks, setTasks] = useState<TaskDto[]>([])
   const [completedIds, setCompletedIds] = useState<number[]>([])
-  const [activePhase, setActivePhase] = useState<number>(1) // 1 = WeekOne, 2 = WeekTwo, 3 = WeekThree, 4 = WeekFour
+  const [activePhase, setActivePhase] = useState<TimelinePhase>(TimelinePhase.WeekOne)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
   const localStorageKey = `meridian_completed_tasks_${role}`
 
-  // Fetch tasks when department role changes
+  // Fetch tasks when department role changes (handling in-flight aborts)
   useEffect(() => {
+    const controller = new AbortController()
     setIsLoading(true)
     setError(null)
     
-    fetch(`/api/tasks?role=${role}`)
+    fetch(`/api/tasks?role=${role}`, { signal: controller.signal })
       .then(res => {
         if (!res.ok) {
           throw new Error(`Failed to fetch tasks for role ${role}`)
@@ -32,9 +33,15 @@ export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
         setIsLoading(false)
       })
       .catch(err => {
-        setError(err.message || 'An error occurred while loading your tasks.')
-        setIsLoading(false)
+        if (err.name !== 'AbortError') {
+          setError(err.message || 'An error occurred while loading your tasks.')
+          setIsLoading(false)
+        }
       })
+
+    return () => {
+      controller.abort()
+    }
   }, [role])
 
   // Load completed task IDs from localStorage on mount/role change
@@ -86,12 +93,17 @@ export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
     }
   }
 
-  // Group tasks by timeline phase
+  // Group tasks by timeline phase enum keys
   const phaseGroupedTasks = useMemo(() => {
-    const groups: { [key: number]: TaskDto[] } = { 1: [], 2: [], 3: [], 4: [] }
+    const groups: { [key in TimelinePhase]?: TaskDto[] } = {
+      [TimelinePhase.WeekOne]: [],
+      [TimelinePhase.WeekTwo]: [],
+      [TimelinePhase.WeekThree]: [],
+      [TimelinePhase.WeekFour]: []
+    }
     tasks.forEach(t => {
       if (groups[t.timelinePhase] !== undefined) {
-        groups[t.timelinePhase].push(t)
+        groups[t.timelinePhase]?.push(t)
       }
     })
     return groups
@@ -102,19 +114,20 @@ export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
   const totalCompletedCount = completedIds.length
   const progressPercent = totalTasksCount > 0 ? Math.round((totalCompletedCount / totalTasksCount) * 100) : 0
 
-  // Phase-specific statistics
+  // Phase-specific statistics mapped by TimelinePhase enum keys
   const phaseStats = useMemo(() => {
-    const stats: { [key: number]: { total: number; completed: number } } = {
-      1: { total: 0, completed: 0 },
-      2: { total: 0, completed: 0 },
-      3: { total: 0, completed: 0 },
-      4: { total: 0, completed: 0 }
+    const stats: { [key in TimelinePhase]?: { total: number; completed: number } } = {
+      [TimelinePhase.WeekOne]: { total: 0, completed: 0 },
+      [TimelinePhase.WeekTwo]: { total: 0, completed: 0 },
+      [TimelinePhase.WeekThree]: { total: 0, completed: 0 },
+      [TimelinePhase.WeekFour]: { total: 0, completed: 0 }
     }
     tasks.forEach(t => {
-      if (stats[t.timelinePhase]) {
-        stats[t.timelinePhase].total += 1
+      const stat = stats[t.timelinePhase]
+      if (stat) {
+        stat.total += 1
         if (completedSet.has(t.id)) {
-          stats[t.timelinePhase].completed += 1
+          stat.completed += 1
         }
       }
     })
