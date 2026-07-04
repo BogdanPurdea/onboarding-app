@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { AppLayout } from './components/AppLayout'
 import { DepartmentSelector } from './components/DepartmentSelector'
+import { OnboardingChecklist } from './components/OnboardingChecklist'
 import { DEPARTMENTS, type DepartmentConfig } from './config/departments'
 
 function App() {
@@ -66,24 +67,17 @@ function App() {
         )}
       </div>
 
-      {currentDept ? (
-        <div className="py-6">
-          <div className="p-6 border border-slate-200 rounded-xl bg-white shadow-sm">
-            <span className="inline-flex items-center rounded-md bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10">
-              {currentDept.name} Flow
+      {selectedRole ? (
+        <div className="py-2">
+          <div className="mb-4">
+            <span className="inline-flex items-center rounded-md bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10">
+              {currentDept?.name} Onboarding Flow
             </span>
-            <h2 className="mt-4 text-2xl font-bold tracking-tight text-slate-950">
-              Onboarding Checklist
-            </h2>
-            <p className="mt-4 text-slate-600 leading-relaxed">
-              {currentDept.welcomeMessage}
-            </p>
-            <div className="mt-8 border-t border-slate-100 pt-6">
-              <span className="text-sm text-slate-400">
-                Tasks view is coming soon...
-              </span>
-            </div>
           </div>
+          <p className="text-sm text-slate-500 leading-relaxed">
+            {currentDept?.welcomeMessage}
+          </p>
+          <OnboardingChecklist role={selectedRole} />
         </div>
       ) : (
         <DepartmentSelector onSelectRole={handleSelectRole} />
