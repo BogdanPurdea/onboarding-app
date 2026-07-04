@@ -1,10 +1,4 @@
-export interface DepartmentConfig {
-  id: number;
-  name: string;
-  roleKey: string;
-  tagline: string;
-  welcomeMessage: string;
-}
+import type { DepartmentConfig } from '../types/index'
 
 export const DEPARTMENTS: DepartmentConfig[] = [
   {

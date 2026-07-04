@@ -1,8 +1,4 @@
-interface OnboardingPhaseTabsProps {
-  activePhase: number
-  onChangePhase: (phase: number) => void
-  phaseStats: { [key: number]: { total: number; completed: number } }
-}
+import type { OnboardingPhaseTabsProps } from '../types/components'
 
 export function OnboardingPhaseTabs({
   activePhase,

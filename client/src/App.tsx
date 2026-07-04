@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { AppLayout } from './components/AppLayout'
 import { DepartmentSelector } from './components/DepartmentSelector'
 import { OnboardingChecklist } from './components/OnboardingChecklist'
-import { DEPARTMENTS, type DepartmentConfig } from './config/departments'
+import { DEPARTMENTS } from './config/departments'
+import type { DepartmentConfig } from './types/index'
 
 function App() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null)

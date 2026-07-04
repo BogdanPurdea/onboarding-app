@@ -1,8 +1,4 @@
-interface OnboardingProgressHeaderProps {
-  completedCount: number
-  totalCount: number
-  progressPercent: number
-}
+import type { OnboardingProgressHeaderProps } from '../types/components'
 
 export function OnboardingProgressHeader({
   completedCount,

@@ -8,3 +8,11 @@ export interface TaskDto {
   displayOrder: number
   prerequisiteTaskIds: number[]
 }
+
+export interface DepartmentConfig {
+  id: number
+  name: string;
+  roleKey: string;
+  tagline: string;
+  welcomeMessage: string;
+}

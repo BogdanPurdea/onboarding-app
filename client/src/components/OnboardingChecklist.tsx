@@ -1,12 +1,10 @@
 import { useState, useEffect, useMemo } from 'react'
 import type { TaskDto } from '../types'
+import type { OnboardingChecklistProps } from '../types/components'
+import { isTaskUnlocked, computeCascadeUnchecks } from '../utils/checklistLogic'
 import { OnboardingProgressHeader } from './OnboardingProgressHeader'
 import { OnboardingPhaseTabs } from './OnboardingPhaseTabs'
 import { OnboardingTaskItem } from './OnboardingTaskItem'
-
-interface OnboardingChecklistProps {
-  role: string
-}
 
 export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
   const [tasks, setTasks] = useState<TaskDto[]>([])
@@ -73,47 +71,16 @@ export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
     return map
   }, [tasks])
 
-  // Helper to determine if a task's prerequisites are met
-  const isTaskUnlocked = (task: TaskDto): boolean => {
-    if (!task.prerequisiteTaskIds || task.prerequisiteTaskIds.length === 0) {
-      return true
-    }
-    return task.prerequisiteTaskIds.every(preId => completedSet.has(preId))
-  }
-
-  // Recursive unchecker for dependent tasks
-  const computeCascadeUnchecks = (uncheckedId: number, currentCompleted: number[]): number[] => {
-    const activeCompleted = new Set(currentCompleted)
-    activeCompleted.delete(uncheckedId)
-
-    let changed = true
-    while (changed) {
-      changed = false
-      // Find any task that is completed but whose prerequisites are no longer satisfied
-      for (const task of tasks) {
-        if (activeCompleted.has(task.id)) {
-          const hasUnsatisfiedPre = task.prerequisiteTaskIds.some(preId => !activeCompleted.has(preId))
-          if (hasUnsatisfiedPre) {
-            activeCompleted.delete(task.id)
-            changed = true
-          }
-        }
-      }
-    }
-
-    return Array.from(activeCompleted)
-  }
-
   const handleToggleTask = (task: TaskDto) => {
     const isCompleted = completedSet.has(task.id)
 
     if (isCompleted) {
       // Unchecking: compute cascade changes
-      const remainingIds = computeCascadeUnchecks(task.id, completedIds)
+      const remainingIds = computeCascadeUnchecks(task.id, completedIds, tasks)
       updateCompletedIds(remainingIds)
     } else {
       // Checking: only allow if unlocked
-      if (isTaskUnlocked(task)) {
+      if (isTaskUnlocked(task, completedSet)) {
         updateCompletedIds([...completedIds, task.id])
       }
     }
@@ -199,7 +166,7 @@ export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
         ) : (
           activePhaseTasks.map(task => {
             const isCompleted = completedSet.has(task.id)
-            const isUnlocked = isTaskUnlocked(task)
+            const isUnlocked = isTaskUnlocked(task, completedSet)
             const prerequisiteTitles = task.prerequisiteTaskIds
               .map(preId => taskTitleMap.get(preId) || `Task #${preId}`)
 

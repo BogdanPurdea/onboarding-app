@@ -1,9 +1,4 @@
-import type { DepartmentConfig } from '../config/departments'
-
-interface DepartmentCardProps {
-  dept: DepartmentConfig
-  onSelectRole: (roleKey: string) => void
-}
+import type { DepartmentCardProps } from '../types/components'
 
 export function DepartmentCard({ dept, onSelectRole }: DepartmentCardProps) {
   return (

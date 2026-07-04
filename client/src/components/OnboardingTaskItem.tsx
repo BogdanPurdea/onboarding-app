@@ -1,12 +1,4 @@
-import type { TaskDto } from '../types'
-
-interface OnboardingTaskItemProps {
-  task: TaskDto
-  isCompleted: boolean
-  isUnlocked: boolean
-  onToggle: () => void
-  prerequisiteTitles: string[]
-}
+import type { OnboardingTaskItemProps } from '../types/components'
 
 export function OnboardingTaskItem({
   task,

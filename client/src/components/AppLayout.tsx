@@ -1,8 +1,4 @@
-import type { ReactNode } from 'react'
-
-interface AppLayoutProps {
-  children: ReactNode
-}
+import type { AppLayoutProps } from '../types/components'
 
 export function AppLayout({ children }: AppLayoutProps) {
   return (
