@@ -76,7 +76,7 @@ public class OnboardingService(IOnboardingRepository repository) : IOnboardingSe
         };
 
         var contacts = department.Contacts
-            .Select(c => new ContactDto(c.Name, c.Role, c.AvatarInitials, c.Email, c.Bio))
+            .Select(c => new ContactDto(c.Name, c.Role, c.AvatarInitials, c.Email, c.Bio, c.SlackMemberId, c.GoogleMeetUrl, c.PreferredCommTool))
             .ToList();
 
         return new DashboardDto(

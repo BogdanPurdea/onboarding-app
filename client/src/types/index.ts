@@ -38,6 +38,8 @@ export interface ContactDto {
   avatarInitials: string
   email: string
   bio: string
+  slackMemberId?: string
+  googleMeetUrl?: string
 }
 
 export interface DashboardDto {

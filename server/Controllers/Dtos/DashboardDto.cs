@@ -5,7 +5,10 @@ public record ContactDto(
     string Role,
     string AvatarInitials,
     string Email,
-    string Bio
+    string Bio,
+    string? SlackMemberId,
+    string? GoogleMeetUrl,
+    string PreferredCommTool
 );
 
 public record DayScheduleDto(

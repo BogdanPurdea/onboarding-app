@@ -1,4 +1,4 @@
-import type { DashboardDto } from '../types'
+import type { DashboardDto } from '../types/index'
 
 const API_BASE = import.meta.env.VITE_API_URL ?? ''
 
