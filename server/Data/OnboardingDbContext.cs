@@ -9,6 +9,7 @@ public class OnboardingDbContext(DbContextOptions<OnboardingDbContext> options) 
     public DbSet<DepartmentContact> DepartmentContacts { get; set; }
     public DbSet<OnboardingTask> OnboardingTasks { get; set; }
     public DbSet<TaskPrerequisite> TaskPrerequisites { get; set; }
+    public DbSet<TaskInstruction> TaskInstructions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -277,5 +278,46 @@ public class OnboardingDbContext(DbContextOptions<OnboardingDbContext> options) 
             // Finance chain
             new TaskPrerequisite { PreDependentTaskId = 38, PostDependentTaskId = 40 }  // Understand Expenses → Monthly Report
         );
+
+        // ── TaskInstructions ─────────────────────────────────────────────────
+        modelBuilder.Entity<TaskInstruction>(entity =>
+        {
+            entity.HasKey(ti => ti.Id);
+            entity.Property(ti => ti.Id).UseIdentityColumn();
+            entity.Property(ti => ti.Text).IsRequired().HasMaxLength(500);
+
+            entity.HasOne(ti => ti.Task)
+                .WithMany(t => t.Instructions)
+                .HasForeignKey(ti => ti.TaskId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Seed TaskInstructions programmatically (120 records total, 3 per task)
+        var instructions = new List<TaskInstruction>();
+        for (int taskId = 1; taskId <= 40; taskId++)
+        {
+            instructions.Add(new TaskInstruction
+            {
+                Id = taskId * 3 - 2,
+                TaskId = taskId,
+                StepNumber = 1,
+                Text = "Read and understand all requirements for this task."
+            });
+            instructions.Add(new TaskInstruction
+            {
+                Id = taskId * 3 - 1,
+                TaskId = taskId,
+                StepNumber = 2,
+                Text = "Sync with your onboarding buddy or team lead if any blockers arise."
+            });
+            instructions.Add(new TaskInstruction
+            {
+                Id = taskId * 3,
+                TaskId = taskId,
+                StepNumber = 3,
+                Text = "Verify and check off the item in your workspace dashboard once done."
+            });
+        }
+        modelBuilder.Entity<TaskInstruction>().HasData(instructions);
     }
 }

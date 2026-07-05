@@ -13,4 +13,5 @@ public class OnboardingTask
     public Department Department { get; set; } = null!;
     public ICollection<TaskPrerequisite> Prerequisites { get; set; } = [];
     public ICollection<TaskPrerequisite> Dependents { get; set; } = [];
+    public ICollection<TaskInstruction> Instructions { get; set; } = [];
 }
