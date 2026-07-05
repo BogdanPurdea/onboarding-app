@@ -50,3 +50,9 @@ export interface DashboardDto {
   weeklySchedule: DayScheduleDto[]
   contacts: ContactDto[]
 }
+
+export interface TaskInstructionsDto {
+  taskId: number
+  taskTitle: string
+  steps: string[]
+}
