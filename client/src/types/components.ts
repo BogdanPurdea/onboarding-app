@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import type { TaskDto, DepartmentConfig, TimelinePhase } from './index'
+import type { TaskDto, DepartmentConfig, TimelinePhase, TaskInstructionsDto } from './index'
 
 export interface AppLayoutProps {
   children: ReactNode
@@ -37,6 +37,8 @@ export interface OnboardingTaskItemProps {
   isUnlocked: boolean
   onToggle: () => void
   prerequisiteTitles: string[]
+  onClick?: () => void
+  isLoadingInstructions?: boolean
 }
 
 export interface OnboardingDashboardProps {
@@ -49,5 +51,10 @@ export interface ContactPickerModalProps {
   avatarInitials: string
   slackMemberId?: string
   googleMeetUrl?: string
+  onClose: () => void
+}
+
+export interface TaskInstructionsDrawerProps {
+  instructions: TaskInstructionsDto
   onClose: () => void
 }

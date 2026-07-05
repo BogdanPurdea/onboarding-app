@@ -1,10 +1,12 @@
 import { useState, useEffect, useMemo } from 'react'
-import { TimelinePhase, type TaskDto } from '../../types/index'
+import { TimelinePhase, type TaskDto, type TaskInstructionsDto } from '../../types/index'
 import type { OnboardingChecklistProps } from '../../types/components'
 import { isTaskUnlocked, computeCascadeUnchecks } from '../../utils/checklistLogic'
 import { OnboardingProgressHeader } from './OnboardingProgressHeader'
 import { OnboardingPhaseTabs } from './OnboardingPhaseTabs'
 import { OnboardingTaskItem } from './OnboardingTaskItem'
+import { TaskInstructionsDrawer } from './TaskInstructionsDrawer'
+import { fetchTaskInstructions, fetchTasks } from '../../utils/tasksApi'
 
 export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
   const [tasks, setTasks] = useState<TaskDto[]>([])
@@ -12,6 +14,8 @@ export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
   const [activePhase, setActivePhase] = useState<TimelinePhase>(TimelinePhase.WeekOne)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
+  const [loadingInstructionsTaskId, setLoadingInstructionsTaskId] = useState<number | null>(null)
+  const [drawerInstructions, setDrawerInstructions] = useState<TaskInstructionsDto | null>(null)
 
   const localStorageKey = `meridian_completed_tasks_${role}`
 
@@ -20,14 +24,10 @@ export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
     const controller = new AbortController()
     setIsLoading(true)
     setError(null)
+    setDrawerInstructions(null)
+    setLoadingInstructionsTaskId(null)
     
-    fetch(`/api/tasks?role=${role}`, { signal: controller.signal })
-      .then(res => {
-        if (!res.ok) {
-          throw new Error(`Failed to fetch tasks for role ${role}`)
-        }
-        return res.json()
-      })
+    fetchTasks(role, controller.signal)
       .then((data: TaskDto[]) => {
         setTasks(data)
         setIsLoading(false)
@@ -91,6 +91,21 @@ export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
         updateCompletedIds([...completedIds, task.id])
       }
     }
+  }
+
+  const handleCardClick = (taskId: number) => {
+    if (loadingInstructionsTaskId !== null) return
+
+    setLoadingInstructionsTaskId(taskId)
+    fetchTaskInstructions(taskId)
+      .then(data => {
+        setDrawerInstructions(data)
+        setLoadingInstructionsTaskId(null)
+      })
+      .catch(err => {
+        console.error(err)
+        setLoadingInstructionsTaskId(null)
+      })
   }
 
   // Group tasks by timeline phase enum keys
@@ -191,11 +206,21 @@ export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
                 isUnlocked={isUnlocked}
                 onToggle={() => handleToggleTask(task)}
                 prerequisiteTitles={prerequisiteTitles}
+                onClick={() => handleCardClick(task.id)}
+                isLoadingInstructions={loadingInstructionsTaskId === task.id}
               />
             )
           })
         )}
       </div>
+
+      {/* Slide up detailed instructions panel */}
+      {drawerInstructions && (
+        <TaskInstructionsDrawer
+          instructions={drawerInstructions}
+          onClose={() => setDrawerInstructions(null)}
+        />
+      )}
     </div>
   )
 }

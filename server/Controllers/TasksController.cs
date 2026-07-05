@@ -28,4 +28,17 @@ public class TasksController(IOnboardingService onboardingService) : ControllerB
             return NotFound(ex.Message);
         }
     }
+
+    [HttpGet("{id}/instructions")]
+    [ProducesResponseType(typeof(TaskInstructionsDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetTaskInstructions(int id)
+    {
+        var instructions = await onboardingService.GetTaskInstructionsAsync(id);
+        if (instructions == null)
+        {
+            return NotFound($"Task with ID {id} not found.");
+        }
+        return Ok(instructions);
+    }
 }

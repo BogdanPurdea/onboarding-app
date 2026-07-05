@@ -15,6 +15,12 @@ public class OnboardingRepository(OnboardingDbContext dbContext) : IOnboardingRe
             .ToListAsync();
     }
 
+    public async Task<OnboardingTask?> GetTaskByIdAsync(int id)
+    {
+        return await dbContext.OnboardingTasks
+            .FirstOrDefaultAsync(t => t.Id == id);
+    }
+
     public async Task<Department?> GetDepartmentByIdAsync(int departmentId)
     {
         return await dbContext.Departments
@@ -40,5 +46,13 @@ public class OnboardingRepository(OnboardingDbContext dbContext) : IOnboardingRe
         return await dbContext.Departments
             .Include(d => d.Contacts.OrderBy(c => c.DisplayOrder))
             .FirstOrDefaultAsync(d => EF.Functions.ILike(d.RoleKey, roleKey));
+    }
+
+    public async Task<IEnumerable<TaskInstruction>> GetTaskInstructionsByTaskIdAsync(int taskId)
+    {
+        return await dbContext.TaskInstructions
+            .Where(i => i.TaskId == taskId)
+            .OrderBy(i => i.StepNumber)
+            .ToListAsync();
     }
 }
