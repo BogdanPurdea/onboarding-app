@@ -42,3 +42,12 @@ export interface OnboardingTaskItemProps {
 export interface OnboardingDashboardProps {
   roleKey: string
 }
+
+export interface ContactPickerModalProps {
+  name: string
+  role: string
+  avatarInitials: string
+  slackMemberId?: string
+  googleMeetUrl?: string
+  onClose: () => void
+}
