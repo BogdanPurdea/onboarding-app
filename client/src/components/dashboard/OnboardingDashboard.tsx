@@ -75,10 +75,10 @@ export function OnboardingDashboard({ roleKey }: OnboardingDashboardProps) {
         </div>
       </section>
 
-      {/* Who's Who directory */}
+      {/* Colleagues directory */}
       <section>
         <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
-          Who's Who
+          Meet who you'll be working with
         </h2>
         <div className="flex flex-col gap-3">
           {dashboard.contacts.map(contact => (
