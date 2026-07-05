@@ -1,4 +1,4 @@
-import type { DayScheduleDto } from '../types'
+import type { DayScheduleDto } from '../../types/index'
 
 export function DayPill({ day, type }: DayScheduleDto) {
   const isOffice = type === 'office'

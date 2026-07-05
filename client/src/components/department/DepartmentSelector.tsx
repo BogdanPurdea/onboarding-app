@@ -1,5 +1,5 @@
-import type { DepartmentConfig } from '../types/index'
-import type { DepartmentSelectorProps } from '../types/components'
+import type { DepartmentConfig } from '../../types/index'
+import type { DepartmentSelectorProps } from '../../types/components'
 import { DepartmentCard } from './DepartmentCard'
 
 export function DepartmentSelector({ onSelectRole, departments }: DepartmentSelectorProps) {

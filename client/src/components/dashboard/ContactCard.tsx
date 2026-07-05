@@ -1,4 +1,4 @@
-import type { ContactDto } from '../types'
+import type { ContactDto } from '../../types/index'
 
 export function ContactCard({ name, role, avatarInitials, email, bio }: ContactDto) {
   return (

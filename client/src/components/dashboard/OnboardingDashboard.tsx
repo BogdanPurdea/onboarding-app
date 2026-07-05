@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import type { DashboardDto } from '../types/index'
-import type { OnboardingDashboardProps } from '../types/components'
+import type { DashboardDto } from '../../types/index'
+import type { OnboardingDashboardProps } from '../../types/components'
 import { DayPill } from './DayPill'
 import { ContactCard } from './ContactCard'
-import { fetchDashboardData } from '../utils/dashboardApi'
+import { fetchDashboardData } from '../../utils/dashboardApi'
 
 export function OnboardingDashboard({ roleKey }: OnboardingDashboardProps) {
   const [dashboard, setDashboard] = useState<DashboardDto | null>(null)
