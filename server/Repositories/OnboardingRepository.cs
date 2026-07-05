@@ -27,4 +27,18 @@ public class OnboardingRepository(OnboardingDbContext dbContext) : IOnboardingRe
         return await dbContext.Departments
             .FirstOrDefaultAsync(d => EF.Functions.ILike(d.Name, name));
     }
+
+    public async Task<IEnumerable<Department>> GetAllDepartmentsAsync()
+    {
+        return await dbContext.Departments
+            .OrderBy(d => d.Id)
+            .ToListAsync();
+    }
+
+    public async Task<Department?> GetDepartmentByRoleKeyAsync(string roleKey)
+    {
+        return await dbContext.Departments
+            .Include(d => d.Contacts.OrderBy(c => c.DisplayOrder))
+            .FirstOrDefaultAsync(d => EF.Functions.ILike(d.RoleKey, roleKey));
+    }
 }

@@ -51,4 +51,41 @@ public class OnboardingService(IOnboardingRepository repository) : IOnboardingSe
                     .ToList()
             });
     }
+
+    public async Task<IEnumerable<DepartmentDto>> GetDepartmentsAsync()
+    {
+        var departments = await repository.GetAllDepartmentsAsync();
+        return departments.Select(d => new DepartmentDto(d.Id, d.Name, d.RoleKey, d.Tagline));
+    }
+
+    public async Task<DashboardDto> GetDepartmentDashboardAsync(string roleKey)
+    {
+        var department = await repository.GetDepartmentByRoleKeyAsync(roleKey.Trim().ToLower());
+        if (department == null)
+        {
+            throw new KeyNotFoundException($"Department with role key '{roleKey}' not found.");
+        }
+
+        var schedule = new List<DayScheduleDto>
+        {
+            new("Monday",    department.MondaySchedule),
+            new("Tuesday",   department.TuesdaySchedule),
+            new("Wednesday", department.WednesdaySchedule),
+            new("Thursday",  department.ThursdaySchedule),
+            new("Friday",    department.FridaySchedule),
+        };
+
+        var contacts = department.Contacts
+            .Select(c => new ContactDto(c.Name, c.Role, c.AvatarInitials, c.Email, c.Bio))
+            .ToList();
+
+        return new DashboardDto(
+            department.Name,
+            department.RoleKey,
+            department.Tagline,
+            department.WelcomeMessage,
+            schedule,
+            contacts
+        );
+    }
 }
