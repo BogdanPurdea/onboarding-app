@@ -10,5 +10,8 @@ public class DepartmentContact
     public string AvatarInitials { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Bio { get; set; } = string.Empty;
+    public string? SlackMemberId { get; set; }
+    public string? GoogleMeetUrl { get; set; }
+    public string PreferredCommTool { get; set; } = "slack";
     public int DisplayOrder { get; set; }
 }
