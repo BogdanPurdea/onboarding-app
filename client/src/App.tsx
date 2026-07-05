@@ -4,9 +4,9 @@ import { DepartmentSelector } from './components/department/DepartmentSelector'
 import { OnboardingChecklist } from './components/checklist/OnboardingChecklist'
 import { OnboardingDashboard } from './components/dashboard/OnboardingDashboard'
 import { ThemeToggle } from './components/layout/ThemeToggle'
+import { fetchDepartments } from './utils/departmentsApi'
 import type { DepartmentConfig } from './types/index'
 
-const API_BASE = import.meta.env.VITE_API_URL ?? ''
 
 type ActiveTab = 'checklist' | 'dashboard'
 
@@ -19,11 +19,7 @@ function App() {
   useEffect(() => {
     const controller = new AbortController()
 
-    fetch(`${API_BASE}/api/departments`, { signal: controller.signal })
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch departments')
-        return res.json() as Promise<DepartmentConfig[]>
-      })
+    fetchDepartments(controller.signal)
       .then(setDepartments)
       .catch(err => {
         if (err.name !== 'AbortError') console.error('Department fetch error:', err)
