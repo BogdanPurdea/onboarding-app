@@ -12,6 +12,7 @@ export interface DepartmentCardProps {
 
 export interface DepartmentSelectorProps {
   onSelectRole: (roleKey: string) => void
+  departments: DepartmentConfig[]
 }
 
 export interface OnboardingChecklistProps {
@@ -36,4 +37,8 @@ export interface OnboardingTaskItemProps {
   isUnlocked: boolean
   onToggle: () => void
   prerequisiteTitles: string[]
+}
+
+export interface OnboardingDashboardProps {
+  roleKey: string
 }

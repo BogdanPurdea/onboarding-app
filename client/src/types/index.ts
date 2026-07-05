@@ -18,10 +18,33 @@ export interface TaskDto {
   prerequisiteTaskIds: number[]
 }
 
+/** Matches GET /api/departments response items */
 export interface DepartmentConfig {
   id: number
-  name: string;
-  roleKey: string;
-  tagline: string;
-  welcomeMessage: string;
+  name: string
+  roleKey: string
+  tagline: string
+}
+
+/** Matches GET /api/departments/{roleKey}/dashboard */
+export interface DayScheduleDto {
+  day: string
+  type: 'office' | 'remote'
+}
+
+export interface ContactDto {
+  name: string
+  role: string
+  avatarInitials: string
+  email: string
+  bio: string
+}
+
+export interface DashboardDto {
+  departmentName: string
+  roleKey: string
+  tagline: string
+  welcomeMessage: string
+  weeklySchedule: DayScheduleDto[]
+  contacts: ContactDto[]
 }
