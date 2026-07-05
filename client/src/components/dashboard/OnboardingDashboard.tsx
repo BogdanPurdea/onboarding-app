@@ -80,7 +80,7 @@ export function OnboardingDashboard({ roleKey }: OnboardingDashboardProps) {
         <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
           Who's Who
         </h2>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="flex flex-col gap-3">
           {dashboard.contacts.map(contact => (
             <ContactCard key={contact.email} {...contact} />
           ))}
