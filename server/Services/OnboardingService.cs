@@ -88,4 +88,15 @@ public class OnboardingService(IOnboardingRepository repository) : IOnboardingSe
             contacts
         );
     }
+
+    public async Task<TaskInstructionsDto?> GetTaskInstructionsAsync(int taskId)
+    {
+        var task = await repository.GetTaskByIdAsync(taskId);
+        if (task == null) return null;
+
+        var instructions = await repository.GetTaskInstructionsByTaskIdAsync(taskId);
+        var steps = instructions.Select(i => i.Text).ToList();
+
+        return new TaskInstructionsDto(task.Id, task.Title, steps);
+    }
 }
