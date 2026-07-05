@@ -1,9 +1,8 @@
-import { DEPARTMENTS } from '../config/departments'
-import type { DepartmentConfig } from '../types/index'
-import type { DepartmentSelectorProps } from '../types/components'
+import type { DepartmentConfig } from '../../types/index'
+import type { DepartmentSelectorProps } from '../../types/components'
 import { DepartmentCard } from './DepartmentCard'
 
-export function DepartmentSelector({ onSelectRole }: DepartmentSelectorProps) {
+export function DepartmentSelector({ onSelectRole, departments }: DepartmentSelectorProps) {
   return (
     <div className="py-6">
       <div className="text-center mb-8">
@@ -16,7 +15,7 @@ export function DepartmentSelector({ onSelectRole }: DepartmentSelectorProps) {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-        {DEPARTMENTS.map((dept: DepartmentConfig) => (
+        {departments.map((dept: DepartmentConfig) => (
           <DepartmentCard
             key={dept.id}
             dept={dept}

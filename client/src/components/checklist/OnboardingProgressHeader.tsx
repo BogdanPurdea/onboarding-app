@@ -1,4 +1,4 @@
-import type { OnboardingProgressHeaderProps } from '../types/components'
+import type { OnboardingProgressHeaderProps } from '../../types/components'
 
 export function OnboardingProgressHeader({
   completedCount,

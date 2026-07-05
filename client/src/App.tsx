@@ -1,44 +1,67 @@
-import { useState, useEffect } from 'react'
-import { AppLayout } from './components/AppLayout'
-import { DepartmentSelector } from './components/DepartmentSelector'
-import { OnboardingChecklist } from './components/OnboardingChecklist'
-import { ThemeToggle } from './components/ThemeToggle'
-import { DEPARTMENTS } from './config/departments'
+import { useState, useEffect, useCallback } from 'react'
+import { AppLayout } from './components/layout/AppLayout'
+import { DepartmentSelector } from './components/department/DepartmentSelector'
+import { OnboardingChecklist } from './components/checklist/OnboardingChecklist'
+import { OnboardingDashboard } from './components/dashboard/OnboardingDashboard'
+import { ThemeToggle } from './components/layout/ThemeToggle'
 import type { DepartmentConfig } from './types/index'
+
+const API_BASE = import.meta.env.VITE_API_URL ?? ''
+
+type ActiveTab = 'checklist' | 'dashboard'
 
 function App() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard')
+  const [departments, setDepartments] = useState<DepartmentConfig[]>([])
 
-  // Initialize selectedRole from query param on mount
+  // Fetch department list from the API
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const roleParam = params.get('role')?.toLowerCase()
-    
-    if (roleParam && DEPARTMENTS.some(d => d.roleKey === roleParam)) {
-      setSelectedRole(roleParam)
-    } else {
-      setSelectedRole(null)
-    }
+    const controller = new AbortController()
+
+    fetch(`${API_BASE}/api/departments`, { signal: controller.signal })
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch departments')
+        return res.json() as Promise<DepartmentConfig[]>
+      })
+      .then(setDepartments)
+      .catch(err => {
+        if (err.name !== 'AbortError') console.error('Department fetch error:', err)
+      })
+
+    return () => controller.abort()
   }, [])
 
-  // Listen to popstate to sync state with browser back/forward buttons
-  useEffect(() => {
-    const handlePopState = () => {
+  const resolveRoleFromParams = useCallback(
+    (depts: DepartmentConfig[]) => {
       const params = new URLSearchParams(window.location.search)
       const roleParam = params.get('role')?.toLowerCase()
-      if (roleParam && DEPARTMENTS.some(d => d.roleKey === roleParam)) {
+      if (roleParam && depts.some(d => d.roleKey === roleParam)) {
         setSelectedRole(roleParam)
       } else {
         setSelectedRole(null)
       }
-    }
+    },
+    []
+  )
 
+  // Initialize selectedRole from query param once departments are loaded
+  useEffect(() => {
+    if (departments.length > 0) {
+      resolveRoleFromParams(departments)
+    }
+  }, [departments, resolveRoleFromParams])
+
+  // Listen to popstate to sync state with browser back/forward buttons
+  useEffect(() => {
+    const handlePopState = () => resolveRoleFromParams(departments)
     window.addEventListener('popstate', handlePopState)
     return () => window.removeEventListener('popstate', handlePopState)
-  }, [])
+  }, [departments, resolveRoleFromParams])
 
   const handleSelectRole = (roleKey: string) => {
     setSelectedRole(roleKey)
+    setActiveTab('dashboard')
     const params = new URLSearchParams(window.location.search)
     if (roleKey) {
       params.set('role', roleKey)
@@ -59,10 +82,7 @@ function App() {
     window.history.pushState({ role: null }, '', newUrl)
   }
 
-  // Look up resolved configuration
-  const currentDept: DepartmentConfig | undefined = DEPARTMENTS.find(
-    d => d.roleKey === selectedRole
-  )
+  const currentDept = departments.find(d => d.roleKey === selectedRole)
 
   return (
     <AppLayout>
@@ -85,18 +105,49 @@ function App() {
 
       {selectedRole ? (
         <div className="py-2">
-          <div className="mb-4">
-            <span className="inline-flex items-center rounded-md bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10 dark:bg-orange-950/20 dark:text-orange-300 dark:ring-orange-400/20">
-              {currentDept?.name} Onboarding Flow
-            </span>
+          {/* Sub-tab navigation */}
+          <div className="flex gap-1 mb-6 border-b border-slate-200 dark:border-slate-800">
+            <button
+              id="tab-dashboard"
+              onClick={() => setActiveTab('dashboard')}
+              className={[
+                'px-4 py-2 text-sm font-medium rounded-t-md transition-colors',
+                activeTab === 'dashboard'
+                  ? 'text-indigo-600 border-b-2 border-indigo-600 dark:text-orange-400 dark:border-orange-400'
+                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+              ].join(' ')}
+            >
+              Team Dashboard
+            </button>
+            <button
+              id="tab-checklist"
+              onClick={() => setActiveTab('checklist')}
+              className={[
+                'px-4 py-2 text-sm font-medium rounded-t-md transition-colors',
+                activeTab === 'checklist'
+                  ? 'text-indigo-600 border-b-2 border-indigo-600 dark:text-orange-400 dark:border-orange-400'
+                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+              ].join(' ')}
+            >
+              Onboarding Checklist
+            </button>
           </div>
-          <p className="text-sm text-slate-500 leading-relaxed dark:text-slate-400">
-            {currentDept?.welcomeMessage}
-          </p>
-          <OnboardingChecklist role={selectedRole} />
+
+          {activeTab === 'checklist' ? (
+            <>
+              <div className="mb-4">
+                <span className="inline-flex items-center rounded-md bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10 dark:bg-orange-950/20 dark:text-orange-300 dark:ring-orange-400/20">
+                  {currentDept?.name} Onboarding Flow
+                </span>
+              </div>
+              <OnboardingChecklist role={selectedRole} />
+            </>
+          ) : (
+            <OnboardingDashboard roleKey={selectedRole} />
+          )}
         </div>
       ) : (
-        <DepartmentSelector onSelectRole={handleSelectRole} />
+        <DepartmentSelector onSelectRole={handleSelectRole} departments={departments} />
       )}
     </AppLayout>
   )

@@ -1,4 +1,4 @@
-import type { AppLayoutProps } from '../types/components'
+import type { AppLayoutProps } from '../../types/components'
 
 export function AppLayout({ children }: AppLayoutProps) {
   return (

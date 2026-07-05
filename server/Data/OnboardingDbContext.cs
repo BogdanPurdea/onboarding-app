@@ -6,6 +6,7 @@ namespace OnboardingApp.Api.Data;
 public class OnboardingDbContext(DbContextOptions<OnboardingDbContext> options) : DbContext(options)
 {
     public DbSet<Department> Departments { get; set; }
+    public DbSet<DepartmentContact> DepartmentContacts { get; set; }
     public DbSet<OnboardingTask> OnboardingTasks { get; set; }
     public DbSet<TaskPrerequisite> TaskPrerequisites { get; set; }
 
@@ -25,22 +26,119 @@ public class OnboardingDbContext(DbContextOptions<OnboardingDbContext> options) 
                 .IsRequired()
                 .HasMaxLength(50);
 
-            // Unique constraint on Name
-            entity.HasIndex(d => d.Name)
-                .IsUnique();
+            entity.Property(d => d.RoleKey)
+                .IsRequired()
+                .HasMaxLength(30);
 
-            // Check constraint – only the 5 core departments are allowed
-            entity.ToTable(t => t.HasCheckConstraint(
-                "CK_Departments_Name",
-                "\"Name\" IN ('Engineering', 'Sales', 'Marketing', 'HR', 'Finance')"));
+            entity.Property(d => d.Tagline)
+                .HasMaxLength(200);
 
-            // Seed the 5 core departments
+            entity.Property(d => d.WelcomeMessage)
+                .HasMaxLength(500);
+
+            entity.Property(d => d.MondaySchedule).HasMaxLength(10).HasDefaultValue("office");
+            entity.Property(d => d.TuesdaySchedule).HasMaxLength(10).HasDefaultValue("office");
+            entity.Property(d => d.WednesdaySchedule).HasMaxLength(10).HasDefaultValue("office");
+            entity.Property(d => d.ThursdaySchedule).HasMaxLength(10).HasDefaultValue("remote");
+            entity.Property(d => d.FridaySchedule).HasMaxLength(10).HasDefaultValue("remote");
+
+            // Unique constraints
+            entity.HasIndex(d => d.Name).IsUnique();
+            entity.HasIndex(d => d.RoleKey).IsUnique();
+
+            // Seed the 5 core departments with schedule and dashboard info
             entity.HasData(
-                new Department { Id = 1, Name = "Engineering" },
-                new Department { Id = 2, Name = "Sales" },
-                new Department { Id = 3, Name = "Marketing" },
-                new Department { Id = 4, Name = "HR" },
-                new Department { Id = 5, Name = "Finance" }
+                new Department
+                {
+                    Id = 1, Name = "Engineering", RoleKey = "engineering",
+                    Tagline = "Build the future, one commit at a time",
+                    WelcomeMessage = "Welcome to Engineering! We are excited to have you on board. Your first weeks will be all about getting your development environment ready and making your first contribution.",
+                    MondaySchedule = "office", TuesdaySchedule = "office", WednesdaySchedule = "office",
+                    ThursdaySchedule = "remote", FridaySchedule = "remote"
+                },
+                new Department
+                {
+                    Id = 2, Name = "Sales", RoleKey = "sales",
+                    Tagline = "Turn every conversation into an opportunity",
+                    WelcomeMessage = "Welcome to Sales! You'll be building relationships that drive Meridian's growth. Start by getting familiar with our CRM and shadowing top performers.",
+                    MondaySchedule = "office", TuesdaySchedule = "remote", WednesdaySchedule = "office",
+                    ThursdaySchedule = "remote", FridaySchedule = "office"
+                },
+                new Department
+                {
+                    Id = 3, Name = "Marketing", RoleKey = "marketing",
+                    Tagline = "Tell the story that moves the market",
+                    WelcomeMessage = "Welcome to Marketing! You'll shape how the world sees Meridian. Dive into the brand playbook and start exploring our content calendar.",
+                    MondaySchedule = "remote", TuesdaySchedule = "office", WednesdaySchedule = "office",
+                    ThursdaySchedule = "remote", FridaySchedule = "remote"
+                },
+                new Department
+                {
+                    Id = 4, Name = "HR", RoleKey = "hr",
+                    Tagline = "People are our greatest product",
+                    WelcomeMessage = "Welcome to HR! You'll play a key role in helping others succeed at Meridian. Start by completing your paperwork and meeting the team.",
+                    MondaySchedule = "office", TuesdaySchedule = "office", WednesdaySchedule = "remote",
+                    ThursdaySchedule = "office", FridaySchedule = "remote"
+                },
+                new Department
+                {
+                    Id = 5, Name = "Finance", RoleKey = "finance",
+                    Tagline = "The numbers that keep us moving forward",
+                    WelcomeMessage = "Welcome to Finance! Your work ensures Meridian's fiscal health. Get started by gaining system access and meeting the finance team.",
+                    MondaySchedule = "office", TuesdaySchedule = "office", WednesdaySchedule = "remote",
+                    ThursdaySchedule = "remote", FridaySchedule = "office"
+                }
+            );
+        });
+
+        // ── DepartmentContacts ───────────────────────────────────────────────
+        modelBuilder.Entity<DepartmentContact>(entity =>
+        {
+            entity.HasKey(c => c.Id);
+
+            entity.Property(c => c.Id).UseIdentityColumn();
+            entity.Property(c => c.Name).IsRequired().HasMaxLength(100);
+            entity.Property(c => c.Role).IsRequired().HasMaxLength(100);
+            entity.Property(c => c.AvatarInitials).HasMaxLength(3);
+            entity.Property(c => c.Email).HasMaxLength(100);
+            entity.Property(c => c.Bio).HasMaxLength(500);
+            entity.Property(c => c.SlackMemberId).HasMaxLength(50);
+            entity.Property(c => c.GoogleMeetUrl).HasMaxLength(150);
+            entity.Property(c => c.PreferredCommTool).HasMaxLength(20).HasDefaultValue("slack");
+
+            entity.HasIndex(c => c.DepartmentId)
+                .HasDatabaseName("IX_DepartmentContacts_DepartmentId");
+
+            entity.HasOne(c => c.Department)
+                .WithMany(d => d.Contacts)
+                .HasForeignKey(c => c.DepartmentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasData(
+                // Engineering
+                new DepartmentContact { Id = 1,  DepartmentId = 1, Name = "Priya Sharma",   Role = "Engineering Manager",    AvatarInitials = "PS", Email = "priya.sharma@meridian.io",   Bio = "Leads the backend platform team. Open-source enthusiast and conference speaker.", SlackMemberId = "U012345678A", GoogleMeetUrl = "https://meet.google.com/pri-ya-sharma", PreferredCommTool = "slack", DisplayOrder = 1 },
+                new DepartmentContact { Id = 2,  DepartmentId = 1, Name = "Liam O'Brien",   Role = "Senior Engineer",         AvatarInitials = "LO", Email = "liam.obrien@meridian.io",    Bio = "Your onboarding buddy. Go-to for architecture questions and code reviews.", SlackMemberId = "U012345678B", GoogleMeetUrl = "https://meet.google.com/lia-m-obrien", PreferredCommTool = "meet", DisplayOrder = 2 },
+                new DepartmentContact { Id = 3,  DepartmentId = 1, Name = "Yuki Tanaka",    Role = "DevOps Engineer",          AvatarInitials = "YT", Email = "yuki.tanaka@meridian.io",    Bio = "Owns CI/CD pipelines and cloud infrastructure. Ask her about the deployment process.", SlackMemberId = "U012345678C", GoogleMeetUrl = "https://meet.google.com/yuk-i-tanaka", PreferredCommTool = "slack", DisplayOrder = 3 },
+
+                // Sales
+                new DepartmentContact { Id = 4,  DepartmentId = 2, Name = "Marcus Webb",    Role = "Sales Manager",            AvatarInitials = "MW", Email = "marcus.webb@meridian.io",    Bio = "Leads the EMEA sales team. Passionate about consultative selling.", SlackMemberId = "U022345678A", GoogleMeetUrl = "https://meet.google.com/mar-c-us-webb", PreferredCommTool = "meet", DisplayOrder = 1 },
+                new DepartmentContact { Id = 5,  DepartmentId = 2, Name = "Sofia Reyes",    Role = "Account Executive",        AvatarInitials = "SR", Email = "sofia.reyes@meridian.io",    Bio = "Your onboarding buddy. Top performer in enterprise deals.", SlackMemberId = "U022345678B", GoogleMeetUrl = "https://meet.google.com/sof-i-a-reyes", PreferredCommTool = "slack", DisplayOrder = 2 },
+                new DepartmentContact { Id = 6,  DepartmentId = 2, Name = "James Okafor",   Role = "Sales Development Rep",    AvatarInitials = "JO", Email = "james.okafor@meridian.io",   Bio = "Manages inbound pipeline and prospect qualification.", SlackMemberId = "U022345678C", GoogleMeetUrl = "https://meet.google.com/jam-e-s-okafor", PreferredCommTool = "slack", DisplayOrder = 3 },
+
+                // Marketing
+                new DepartmentContact { Id = 7,  DepartmentId = 3, Name = "Amara Diallo",   Role = "Head of Marketing",       AvatarInitials = "AD", Email = "amara.diallo@meridian.io",   Bio = "Drives brand strategy and growth campaigns across all channels.", SlackMemberId = "U032345678A", GoogleMeetUrl = "https://meet.google.com/ama-r-a-diallo", PreferredCommTool = "meet", DisplayOrder = 1 },
+                new DepartmentContact { Id = 8,  DepartmentId = 3, Name = "Chris Park",     Role = "Content Strategist",       AvatarInitials = "CP", Email = "chris.park@meridian.io",     Bio = "Your onboarding buddy. Owns the content calendar and editorial voice.", SlackMemberId = "U032345678B", GoogleMeetUrl = "https://meet.google.com/chr-i-s-park", PreferredCommTool = "slack", DisplayOrder = 2 },
+                new DepartmentContact { Id = 9,  DepartmentId = 3, Name = "Elena Morel",    Role = "Performance Marketer",     AvatarInitials = "EM", Email = "elena.morel@meridian.io",    Bio = "Runs paid acquisition campaigns and analyses conversion metrics.", SlackMemberId = "U032345678C", GoogleMeetUrl = "https://meet.google.com/ele-n-a-morel", PreferredCommTool = "slack", DisplayOrder = 3 },
+
+                // HR
+                new DepartmentContact { Id = 10, DepartmentId = 4, Name = "David Kim",      Role = "HR Director",             AvatarInitials = "DK", Email = "david.kim@meridian.io",      Bio = "Oversees talent acquisition, L&D, and employee experience.", SlackMemberId = "U042345678A", GoogleMeetUrl = "https://meet.google.com/dav-i-d-kim", PreferredCommTool = "meet", DisplayOrder = 1 },
+                new DepartmentContact { Id = 11, DepartmentId = 4, Name = "Fatima Al-Sayed", Role = "People Operations Lead",  AvatarInitials = "FA", Email = "fatima.alsayed@meridian.io", Bio = "Your onboarding buddy. Manages benefits, compliance, and HR ops.", SlackMemberId = "U042345678B", GoogleMeetUrl = "https://meet.google.com/fat-i-m-a", PreferredCommTool = "slack", DisplayOrder = 2 },
+                new DepartmentContact { Id = 12, DepartmentId = 4, Name = "Tom Brennan",    Role = "Talent Acquisition Spec.", AvatarInitials = "TB", Email = "tom.brennan@meridian.io",    Bio = "Leads recruiting efforts across all departments.", SlackMemberId = "U042345678C", GoogleMeetUrl = "https://meet.google.com/tom-bren-nan", PreferredCommTool = "slack", DisplayOrder = 3 },
+
+                // Finance
+                new DepartmentContact { Id = 13, DepartmentId = 5, Name = "Nadia Petrov",   Role = "Finance Lead",            AvatarInitials = "NP", Email = "nadia.petrov@meridian.io",   Bio = "Owns financial reporting, forecasting, and budget cycles.", SlackMemberId = "U052345678A", GoogleMeetUrl = "https://meet.google.com/nad-i-a-petrov", PreferredCommTool = "meet", DisplayOrder = 1 },
+                new DepartmentContact { Id = 14, DepartmentId = 5, Name = "Arjun Mehta",    Role = "Financial Analyst",       AvatarInitials = "AM", Email = "arjun.mehta@meridian.io",    Bio = "Your onboarding buddy. Specialises in expense reporting and financial modelling.", SlackMemberId = "U052345678B", GoogleMeetUrl = "https://meet.google.com/arj-u-n-mehta", PreferredCommTool = "slack", DisplayOrder = 2 },
+                new DepartmentContact { Id = 15, DepartmentId = 5, Name = "Laura Bennett",  Role = "Payroll Specialist",      AvatarInitials = "LB", Email = "laura.bennett@meridian.io",  Bio = "Handles payroll processing and employee compensation queries.", SlackMemberId = "U052345678C", GoogleMeetUrl = "https://meet.google.com/lau-r-a-bennett", PreferredCommTool = "slack", DisplayOrder = 3 }
             );
         });
 

@@ -1,4 +1,4 @@
-import type { DepartmentCardProps } from '../types/components'
+import type { DepartmentCardProps } from '../../types/components'
 
 export function DepartmentCard({ dept, onSelectRole }: DepartmentCardProps) {
   return (

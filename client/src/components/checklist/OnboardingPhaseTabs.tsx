@@ -1,5 +1,5 @@
-import { TimelinePhase } from '../types/index'
-import type { OnboardingPhaseTabsProps } from '../types/components'
+import { TimelinePhase } from '../../types/index'
+import type { OnboardingPhaseTabsProps } from '../../types/components'
 
 export function OnboardingPhaseTabs({
   activePhase,

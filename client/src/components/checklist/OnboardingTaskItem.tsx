@@ -1,4 +1,4 @@
-import type { OnboardingTaskItemProps } from '../types/components'
+import type { OnboardingTaskItemProps } from '../../types/components'
 
 export function OnboardingTaskItem({
   task,
