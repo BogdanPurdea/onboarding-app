@@ -1,6 +1,5 @@
-/**
- * Mappings and helper logic for the Ask Meridian assistant bot.
- */
+import type { ChatMessage } from '../types/index'
+import { CHAT_CONFIG } from '../config/chatConfig'
 
 /**
  * Returns a human-friendly department name from the role key.
@@ -91,5 +90,43 @@ export function getMockResponse(userInput: string, role: string | null): string 
     return `If you have blocker issues, you can reach out directly to your manager or team lead. For the ${deptName} department, check the Team Contacts dashboard for direct emails, Slack IDs, and Google Meet scheduling links.`
   }
 
-  return "I'm not sure I have details on that specific question yet. Try asking about 'setup instructions', 'docker command', 'who is my buddy', or reach out to your department manager listed on the team contacts dashboard."
+  return CHAT_CONFIG.FALLBACK_RESPONSE
 }
+
+/**
+ * Pings the local Ollama instance tags endpoint to verify if the specified model is present.
+ */
+export async function checkModelAvailability(modelName: string): Promise<boolean> {
+  try {
+    const res = await fetch(`${CHAT_CONFIG.OLLAMA_BASE_URL}/api/tags`)
+    if (!res.ok) return false
+    const data = await res.json()
+    const models = data.models || []
+    return models.some((m: any) => m.name.startsWith(modelName))
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Builds the dynamic welcome text greeting matching the selected department role.
+ */
+export function getWelcomeMessage(role: string | null): string {
+  const deptName = getDeptName(role)
+  return role
+    ? CHAT_CONFIG.ROLE_WELCOME_TEMPLATE(deptName)
+    : CHAT_CONFIG.DEFAULT_WELCOME
+}
+
+/**
+ * Instantiates a ChatMessage object with generated UUIDs and timestamps.
+ */
+export function createMessage(sender: 'user' | 'assistant', text: string, id?: string): ChatMessage {
+  return {
+    id: id || crypto.randomUUID(),
+    sender,
+    text,
+    timestamp: new Date()
+  }
+}
+

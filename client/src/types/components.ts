@@ -76,6 +76,7 @@ export interface ChatDrawerProps {
   messages: ChatMessage[]
   isTyping: boolean
   onSendMessage: (text: string) => void
+  isLlmActive: boolean
 }
 
 export interface ChatMessageListProps {

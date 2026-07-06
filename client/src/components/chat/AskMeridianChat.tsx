@@ -1,7 +1,14 @@
 import { useState, useEffect } from 'react'
 import { ChatFab } from './ChatFab'
 import { ChatDrawer } from './ChatDrawer'
-import { getDeptName, getMockResponse } from '../../utils/chatLogic'
+import {
+  getWelcomeMessage,
+  checkModelAvailability,
+  createMessage,
+  getMockResponse
+} from '../../utils/chatLogic'
+import { sendChatMessage } from '../../utils/chatLlm'
+import { CHAT_CONFIG } from '../../config/chatConfig'
 import type { ChatMessage } from '../../types/index'
 import type { AskMeridianChatProps } from '../../types/components'
 
@@ -9,49 +16,42 @@ export function AskMeridianChat({ role }: AskMeridianChatProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isTyping, setIsTyping] = useState(false)
+  const [isLlmActive, setIsLlmActive] = useState<boolean>(true)
+
+  // Query local Ollama instance on mount to check if gemma4 is available
+  useEffect(() => {
+    checkModelAvailability(CHAT_CONFIG.MODEL_NAME)
+      .then(available => setIsLlmActive(available))
+  }, [])
 
   // Initialize messages on role change or mount
   useEffect(() => {
-    const deptName = getDeptName(role)
-    const welcomeText = role
-      ? `Welcome to the ${deptName} team! I'm your Meridian Navigator assistant. Ask me anything about your department tasks, development requirements, or tool setups.`
-      : "Hi! Welcome to Meridian. I'm your onboarding assistant. Select a department role or ask me general onboarding questions to get started."
-
-    setMessages([
-      {
-        id: 'welcome',
-        sender: 'assistant',
-        text: welcomeText,
-        timestamp: new Date()
-      }
-    ])
+    const welcomeText = getWelcomeMessage(role)
+    setMessages([createMessage('assistant', welcomeText, 'welcome')])
     setIsTyping(false)
   }, [role])
 
   const handleSendMessage = (text: string) => {
     if (!text.trim() || isTyping) return
 
-    const userMsg: ChatMessage = {
-      id: crypto.randomUUID(),
-      sender: 'user',
-      text,
-      timestamp: new Date()
-    }
-
-    setMessages(prev => [...prev, userMsg])
+    const userMsg = createMessage('user', text)
+    const updatedMessages = [...messages, userMsg]
+    setMessages(updatedMessages)
     setIsTyping(true)
 
-    // Simulate thinking/typing delay
-    setTimeout(() => {
-      const assistantMsg: ChatMessage = {
-        id: crypto.randomUUID(),
-        sender: 'assistant',
-        text: getMockResponse(text, role),
-        timestamp: new Date()
-      }
-      setMessages(prev => [...prev, assistantMsg])
-      setIsTyping(false)
-    }, 750)
+    sendChatMessage(updatedMessages, role)
+      .then(reply => {
+        setMessages(prev => [...prev, createMessage('assistant', reply)])
+      })
+      .catch(err => {
+        console.warn('Ollama communication error, falling back to local mock response:', err)
+        setIsLlmActive(false) // Set to inactive when connection/model error happens
+        const fallbackReply = getMockResponse(text, role)
+        setMessages(prev => [...prev, createMessage('assistant', fallbackReply)])
+      })
+      .finally(() => {
+        setIsTyping(false)
+      })
   }
 
   return (
@@ -64,6 +64,7 @@ export function AskMeridianChat({ role }: AskMeridianChatProps) {
         messages={messages}
         isTyping={isTyping}
         onSendMessage={handleSendMessage}
+        isLlmActive={isLlmActive}
       />
     </>
   )

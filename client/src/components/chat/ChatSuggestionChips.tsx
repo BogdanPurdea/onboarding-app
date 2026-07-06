@@ -1,4 +1,5 @@
 import { getSuggestionChips } from '../../utils/chatLogic'
+import { CHAT_CONFIG } from '../../config/chatConfig'
 import type { ChatSuggestionChipsProps } from '../../types/components'
 
 export function ChatSuggestionChips({ role, onChipClick, isTyping }: ChatSuggestionChipsProps) {
@@ -7,7 +8,7 @@ export function ChatSuggestionChips({ role, onChipClick, isTyping }: ChatSuggest
   return (
     <div className="p-3 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800/80">
       <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-2 px-1">
-        Suggested Questions
+        {CHAT_CONFIG.SUGGESTED_HEADER}
       </span>
       <div className="flex flex-wrap gap-1.5 max-h-[88px] overflow-y-auto">
         {chips.map((chip, idx) => (

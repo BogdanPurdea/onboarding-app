@@ -1,6 +1,7 @@
 import { ChatMessageList } from './ChatMessageList'
 import { ChatSuggestionChips } from './ChatSuggestionChips'
 import { ChatInput } from './ChatInput'
+import { CHAT_CONFIG } from '../../config/chatConfig'
 import type { ChatDrawerProps } from '../../types/components'
 
 
@@ -10,7 +11,8 @@ export function ChatDrawer({
   role,
   messages,
   isTyping,
-  onSendMessage
+  onSendMessage,
+  isLlmActive
 }: ChatDrawerProps) {
   if (!isOpen) return null
 
@@ -32,12 +34,19 @@ export function ChatDrawer({
             </div>
             <div>
               <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">
-                Ask Meridian
+                {CHAT_CONFIG.DRAWER_TITLE}
               </h3>
-              <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-                Navigator Bot • Active
-              </p>
+              {isLlmActive ? (
+                <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                  {CHAT_CONFIG.BOT_NAME} • {CHAT_CONFIG.STATUS_ACTIVE}
+                </p>
+              ) : (
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700 inline-block"></span>
+                  {CHAT_CONFIG.BOT_NAME} • {CHAT_CONFIG.STATUS_INACTIVE}
+                </p>
+              )}
             </div>
           </div>
 

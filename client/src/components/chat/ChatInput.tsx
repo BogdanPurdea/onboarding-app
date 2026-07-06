@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { CHAT_CONFIG } from '../../config/chatConfig'
 import type { ChatInputProps } from '../../types/components'
 
 export function ChatInput({ onSendMessage, isTyping }: ChatInputProps) {
@@ -20,7 +21,7 @@ export function ChatInput({ onSendMessage, isTyping }: ChatInputProps) {
         type="text"
         value={input}
         onChange={e => setInput(e.target.value)}
-        placeholder="Ask about setups, buddies, etc..."
+        placeholder={CHAT_CONFIG.INPUT_PLACEHOLDER}
         disabled={isTyping}
         className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-800 dark:border-slate-800 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:ring-orange-400"
       />
