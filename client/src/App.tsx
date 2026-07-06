@@ -6,6 +6,7 @@ import { OnboardingDashboard } from './components/dashboard/OnboardingDashboard'
 import { ThemeToggle } from './components/layout/ThemeToggle'
 import { fetchDepartments } from './utils/departmentsApi'
 import type { DepartmentConfig } from './types/index'
+import { AskMeridianChat } from './components/chat/AskMeridianChat'
 
 
 type ActiveTab = 'checklist' | 'dashboard'
@@ -145,6 +146,7 @@ function App() {
       ) : (
         <DepartmentSelector onSelectRole={handleSelectRole} departments={departments} />
       )}
+      <AskMeridianChat role={selectedRole} />
     </AppLayout>
   )
 }

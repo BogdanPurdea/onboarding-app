@@ -62,3 +62,11 @@ export interface ProgressSyncRequest {
   sessionToken: string
   completedTaskIds: number[]
 }
+
+export interface ChatMessage {
+  id: string
+  sender: 'user' | 'assistant'
+  text: string
+  timestamp: Date
+}
+
