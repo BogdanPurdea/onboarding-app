@@ -7,17 +7,17 @@ import { OnboardingPhaseTabs } from './OnboardingPhaseTabs'
 import { OnboardingTaskItem } from './OnboardingTaskItem'
 import { TaskInstructionsDrawer } from './TaskInstructionsDrawer'
 import { fetchTaskInstructions, fetchTasks } from '../../utils/tasksApi'
+import { useChecklistProgress } from '../../hooks/useChecklistProgress'
 
 export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
   const [tasks, setTasks] = useState<TaskDto[]>([])
-  const [completedIds, setCompletedIds] = useState<number[]>([])
   const [activePhase, setActivePhase] = useState<TimelinePhase>(TimelinePhase.WeekOne)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
   const [loadingInstructionsTaskId, setLoadingInstructionsTaskId] = useState<number | null>(null)
   const [drawerInstructions, setDrawerInstructions] = useState<TaskInstructionsDto | null>(null)
 
-  const localStorageKey = `meridian_completed_tasks_${role}`
+  const { completedIds, isProgressLoading, updateCompletedIds } = useChecklistProgress(role)
 
   // Fetch tasks when department role changes (handling in-flight aborts)
   useEffect(() => {
@@ -44,29 +44,8 @@ export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
     }
   }, [role])
 
-  // Load completed task IDs from localStorage on mount/role change
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(localStorageKey)
-      if (saved) {
-        setCompletedIds(JSON.parse(saved))
-      } else {
-        setCompletedIds([])
-      }
-    } catch {
-      setCompletedIds([])
-    }
-  }, [role, localStorageKey])
-
-  // Save completed task IDs to localStorage
-  const updateCompletedIds = (newIds: number[]) => {
-    setCompletedIds(newIds)
-    try {
-      localStorage.setItem(localStorageKey, JSON.stringify(newIds))
-    } catch (e) {
-      console.error('Failed to save progress to localStorage:', e)
-    }
-  }
+  // Progress state (completedIds, isProgressLoading, updateCompletedIds)
+  // is managed by useChecklistProgress which handles DB sync and localStorage caching.
 
   // Set of completed task IDs for O(1) lookups
   const completedSet = useMemo(() => new Set(completedIds), [completedIds])
@@ -149,7 +128,7 @@ export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
     return stats
   }, [tasks, completedSet])
 
-  if (isLoading) {
+  if (isLoading || isProgressLoading) {
     return (
       <div className="py-12 text-center text-slate-500 font-medium animate-pulse">
         Loading onboarding checklist...
