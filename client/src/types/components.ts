@@ -24,7 +24,7 @@ export interface OnboardingProgressHeaderProps {
   totalCount: number
   progressPercent: number
   onCopyLink?: () => void
-  linkCopied?: boolean
+  copyStatus?: 'idle' | 'copied' | 'error'
 }
 
 export interface OnboardingPhaseTabsProps {

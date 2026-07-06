@@ -18,10 +18,13 @@ export async function fetchProgress(token: string, signal?: AbortSignal): Promis
  * This is a full replace — the backend deletes existing records and inserts the new array.
  */
 export async function syncProgress(request: ProgressSyncRequest, signal?: AbortSignal): Promise<void> {
-  await fetch(`${API_BASE}/api/progress/sync`, {
+  const res = await fetch(`${API_BASE}/api/progress/sync`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(request),
     signal,
   })
+  if (!res.ok) {
+    throw new Error(`Failed to sync progress (${res.status})`)
+  }
 }

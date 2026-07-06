@@ -19,7 +19,7 @@ export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
   const [drawerInstructions, setDrawerInstructions] = useState<TaskInstructionsDto | null>(null)
 
   const { completedIds, isProgressLoading, updateCompletedIds } = useChecklistProgress(role)
-  const [linkCopied, setLinkCopied] = useState<boolean>(false)
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'error'>('idle')
 
   // Fetch tasks when department role changes (handling in-flight aborts)
   useEffect(() => {
@@ -51,10 +51,22 @@ export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
 
   const handleCopyLink = () => {
     const link = buildRecoveryLink(role)
-    navigator.clipboard.writeText(link).then(() => {
-      setLinkCopied(true)
-      setTimeout(() => setLinkCopied(false), 2000)
-    })
+    if (!navigator.clipboard?.writeText) {
+      setCopyStatus('error')
+      setTimeout(() => setCopyStatus('idle'), 2000)
+      return
+    }
+
+    navigator.clipboard.writeText(link)
+      .then(() => {
+        setCopyStatus('copied')
+        setTimeout(() => setCopyStatus('idle'), 2000)
+      })
+      .catch(err => {
+        console.error('Failed to copy recovery link:', err)
+        setCopyStatus('error')
+        setTimeout(() => setCopyStatus('idle'), 2000)
+      })
   }
 
   // Set of completed task IDs for O(1) lookups
@@ -166,7 +178,7 @@ export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
         totalCount={totalTasksCount}
         progressPercent={progressPercent}
         onCopyLink={handleCopyLink}
-        linkCopied={linkCopied}
+        copyStatus={copyStatus}
       />
 
       {/* Phase Tabs */}

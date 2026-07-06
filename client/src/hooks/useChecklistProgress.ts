@@ -62,7 +62,7 @@ export function useChecklistProgress(role: string) {
         clearTimeout(debounceTimer.current)
       }
     }
-  }, [role]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [role, sessionToken, localStorageKey])
 
   /**
    * Updates the completed task IDs.

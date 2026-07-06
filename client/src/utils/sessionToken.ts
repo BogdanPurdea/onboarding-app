@@ -1,4 +1,5 @@
 const SESSION_TOKEN_PREFIX = 'meridian_session_token_'
+const inMemoryTokens: Record<string, string> = {}
 
 /**
  * Reads the anonymous session token scoped to a specific department role.
@@ -10,6 +11,8 @@ const SESSION_TOKEN_PREFIX = 'meridian_session_token_'
  *    is stripped from the address bar via `history.replaceState`.
  * 2. An existing token already stored in `localStorage` for this role.
  * 3. A freshly generated UUID v4, persisted in `localStorage` for this role.
+ *
+ * Falls back to an in-memory cache if localStorage is unavailable (e.g., disabled).
  */
 export function getOrCreateSessionToken(role: string): string {
   const tokenKey = `${SESSION_TOKEN_PREFIX}${role}`
@@ -20,7 +23,13 @@ export function getOrCreateSessionToken(role: string): string {
   const urlRole = params.get('role')
 
   if (urlToken && urlRole === role) {
-    localStorage.setItem(tokenKey, urlToken)
+    try {
+      localStorage.setItem(tokenKey, urlToken)
+    } catch {
+      // localStorage is unavailable
+    }
+    inMemoryTokens[role] = urlToken
+
     // Strip ?token= from the address bar without causing a page reload
     params.delete('token')
     const newSearch = params.toString()
@@ -31,12 +40,31 @@ export function getOrCreateSessionToken(role: string): string {
     return urlToken
   }
 
-  // 2. Existing persisted token
-  let token = localStorage.getItem(tokenKey)
-  if (!token) {
-    // 3. Generate a new token
-    token = crypto.randomUUID()
+  // 2. Check in-memory cache first
+  if (inMemoryTokens[role]) {
+    return inMemoryTokens[role]
+  }
+
+  // 3. Existing persisted token
+  let token: string | null = null
+  try {
+    token = localStorage.getItem(tokenKey)
+  } catch {
+    // localStorage is unavailable
+  }
+
+  if (token) {
+    inMemoryTokens[role] = token
+    return token
+  }
+
+  // 4. Generate new token
+  token = crypto.randomUUID()
+  inMemoryTokens[role] = token
+  try {
     localStorage.setItem(tokenKey, token)
+  } catch {
+    // localStorage is unavailable
   }
   return token
 }
@@ -54,5 +82,3 @@ export function buildRecoveryLink(role: string): string {
   params.set('token', token)
   return `${window.location.origin}${window.location.pathname}?${params.toString()}`
 }
-
-
