@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import type { TaskDto, DepartmentConfig, TimelinePhase, TaskInstructionsDto } from './index'
+import type { TaskDto, DepartmentConfig, TimelinePhase, TaskInstructionsDto, ChatMessage } from './index'
 
 export interface AppLayoutProps {
   children: ReactNode
@@ -60,3 +60,38 @@ export interface TaskInstructionsDrawerProps {
   instructions: TaskInstructionsDto
   onClose: () => void
 }
+
+export interface AskMeridianChatProps {
+  role: string | null
+}
+
+export interface ChatFabProps {
+  onClick: () => void
+}
+
+export interface ChatDrawerProps {
+  isOpen: boolean
+  onClose: () => void
+  role: string | null
+  messages: ChatMessage[]
+  isTyping: boolean
+  onSendMessage: (text: string) => void
+  isLlmActive: boolean
+}
+
+export interface ChatMessageListProps {
+  messages: ChatMessage[]
+  isTyping: boolean
+}
+
+export interface ChatSuggestionChipsProps {
+  role: string | null
+  onChipClick: (text: string) => void
+  isTyping: boolean
+}
+
+export interface ChatInputProps {
+  onSendMessage: (text: string) => void
+  isTyping: boolean
+}
+
