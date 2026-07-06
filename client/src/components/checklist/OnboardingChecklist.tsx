@@ -8,6 +8,7 @@ import { OnboardingTaskItem } from './OnboardingTaskItem'
 import { TaskInstructionsDrawer } from './TaskInstructionsDrawer'
 import { fetchTaskInstructions, fetchTasks } from '../../utils/tasksApi'
 import { useChecklistProgress } from '../../hooks/useChecklistProgress'
+import { buildRecoveryLink } from '../../utils/sessionToken'
 
 export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
   const [tasks, setTasks] = useState<TaskDto[]>([])
@@ -18,6 +19,7 @@ export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
   const [drawerInstructions, setDrawerInstructions] = useState<TaskInstructionsDto | null>(null)
 
   const { completedIds, isProgressLoading, updateCompletedIds } = useChecklistProgress(role)
+  const [linkCopied, setLinkCopied] = useState<boolean>(false)
 
   // Fetch tasks when department role changes (handling in-flight aborts)
   useEffect(() => {
@@ -46,6 +48,14 @@ export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
 
   // Progress state (completedIds, isProgressLoading, updateCompletedIds)
   // is managed by useChecklistProgress which handles DB sync and localStorage caching.
+
+  const handleCopyLink = () => {
+    const link = buildRecoveryLink()
+    navigator.clipboard.writeText(link).then(() => {
+      setLinkCopied(true)
+      setTimeout(() => setLinkCopied(false), 2000)
+    })
+  }
 
   // Set of completed task IDs for O(1) lookups
   const completedSet = useMemo(() => new Set(completedIds), [completedIds])
@@ -155,6 +165,8 @@ export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
         completedCount={totalCompletedCount}
         totalCount={totalTasksCount}
         progressPercent={progressPercent}
+        onCopyLink={handleCopyLink}
+        linkCopied={linkCopied}
       />
 
       {/* Phase Tabs */}
