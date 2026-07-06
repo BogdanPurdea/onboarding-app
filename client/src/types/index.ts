@@ -56,3 +56,9 @@ export interface TaskInstructionsDto {
   taskTitle: string
   steps: string[]
 }
+
+/** Matches POST /api/progress/sync request body */
+export interface ProgressSyncRequest {
+  sessionToken: string
+  completedTaskIds: number[]
+}

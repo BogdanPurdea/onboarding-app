@@ -10,6 +10,7 @@ public class OnboardingDbContext(DbContextOptions<OnboardingDbContext> options) 
     public DbSet<OnboardingTask> OnboardingTasks { get; set; }
     public DbSet<TaskPrerequisite> TaskPrerequisites { get; set; }
     public DbSet<TaskInstruction> TaskInstructions { get; set; }
+    public DbSet<OnboardingProgress> OnboardingProgresses { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -289,6 +290,18 @@ public class OnboardingDbContext(DbContextOptions<OnboardingDbContext> options) 
             entity.HasOne(ti => ti.Task)
                 .WithMany(t => t.Instructions)
                 .HasForeignKey(ti => ti.TaskId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ── OnboardingProgress ───────────────────────────────────────────────
+        modelBuilder.Entity<OnboardingProgress>(entity =>
+        {
+            // Composite primary key: (SessionToken, TaskId)
+            entity.HasKey(op => new { op.SessionToken, op.TaskId });
+
+            entity.HasOne(op => op.Task)
+                .WithMany()
+                .HasForeignKey(op => op.TaskId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
