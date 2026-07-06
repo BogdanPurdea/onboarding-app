@@ -16,6 +16,8 @@ builder.Services.AddDbContext<OnboardingDbContext>(options =>
 // Register Repository and Service abstractions
 builder.Services.AddScoped<IOnboardingRepository, OnboardingRepository>();
 builder.Services.AddScoped<IOnboardingService, OnboardingService>();
+builder.Services.AddScoped<IProgressRepository, ProgressRepository>();
+builder.Services.AddScoped<IProgressService, ProgressService>();
 
 var app = builder.Build();
 
