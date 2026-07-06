@@ -17,7 +17,7 @@ const DEBOUNCE_MS = 500
  */
 export function useChecklistProgress(role: string) {
   const localStorageKey = `${LOCAL_STORAGE_KEY_PREFIX}${role}`
-  const sessionToken = getOrCreateSessionToken()
+  const sessionToken = getOrCreateSessionToken(role)
 
   const [completedIds, setCompletedIds] = useState<number[]>([])
   const [isProgressLoading, setIsProgressLoading] = useState<boolean>(true)

@@ -50,7 +50,7 @@ export function OnboardingChecklist({ role }: OnboardingChecklistProps) {
   // is managed by useChecklistProgress which handles DB sync and localStorage caching.
 
   const handleCopyLink = () => {
-    const link = buildRecoveryLink()
+    const link = buildRecoveryLink(role)
     navigator.clipboard.writeText(link).then(() => {
       setLinkCopied(true)
       setTimeout(() => setLinkCopied(false), 2000)
