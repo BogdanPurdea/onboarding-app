@@ -1,21 +1,34 @@
 # Meridian Onboarding App
 
-Welcome to the Meridian Onboarding App! This application helps new hires navigate their onboarding tracks, complete role-specific tasks, view department information, connect with team buddies, and sync progress anonymously across sessions.
-
----
-
 ## Local Setup & Run Instructions
 
-Follow these instructions to run the database, backend server, frontend client, and the local LLM chatbot on your local machine.
-
-### Prerequisites
-Make sure you have the following installed:
-1. **.NET 10 SDK** (to compile and run the backend)
-2. **Node.js** (v18+ recommended) and **npm** (to run the React client)
-3. **PostgreSQL** Database Server (running on port `5432` with username `postgres` and password `postgres`)
-4. **Ollama** (optional, to run the local AI Chat Assistant)
+Follow these instructions to run the database, backend server, frontend client, and the local LLM chatbot locally.
 
 ---
+
+### Quick Start – Docker (Recommended)
+
+If you have [**Docker Desktop**](https://www.docker.com/products/docker-desktop/) installed, a single command starts all three services (PostgreSQL, .NET API, and React client) with the database auto-migrated and seeded:
+
+```bash
+docker compose up --build
+```
+
+The application will be available at **`http://localhost:3000`** once all containers are healthy. No other installs required.
+
+> **Note**: The chat assistant requires Ollama to be running separately on the host machine (see [Setup Local Ollama Chatbot](#4-setup-local-ollama-chatbot-optional) below). All other features work inside Docker.
+
+---
+
+### Manual Setup Prerequisites
+If you prefer to run services natively, make sure you have the following installed:
+1. [**.NET 10 SDK**](https://dotnet.microsoft.com/en-us/download) (to compile and run the backend)
+2. [**Node.js**](https://nodejs.org/en) (v18+ recommended) and [**npm**](https://www.npmjs.com/) (to run the React client)
+3. [**PostgreSQL**](https://www.postgresql.org/download/) Database Server (running on port `5432` with username `postgres` and password `postgres`)
+4. [**Ollama**](https://ollama.com/) (optional, to run the local Chat Assistant)
+
+---
+
 
 ### 1. Database Setup
 The C# backend uses Entity Framework Core (Code First) to manage the database schema.
@@ -73,7 +86,7 @@ The C# backend uses Entity Framework Core (Code First) to manage the database sc
 ---
 
 ### 4. Setup Local Ollama Chatbot (Optional)
-The "Ask Meridian" chat assistant queries a local LLM to support natural language questions and onboarding task tool execution.
+The chat assistant queries a local LLM to support natural language questions and onboarding task tool execution.
 
 1. **Download & Install Ollama** from [ollama.com](https://ollama.com).
 2. **Download Model**: Pull the `gemma4:latest` model locally:
@@ -84,4 +97,4 @@ The "Ask Meridian" chat assistant queries a local LLM to support natural languag
    ```bash
    OLLAMA_ORIGINS="*" ollama serve
    ```
-4. Refresh your client page. The chat drawer status will change to **Navigator Bot • Active**, enabling interactive chat with tool execution loops (fetching tasks, schedules, buddies). If Ollama is shut down, the chat gracefully falls back to local rule-based keyword replies.
+4. Refresh the client page. The chat drawer status will change to **Navigator Bot • Active**, allowing chat interaction. If Ollama is shut down, the chat falls back to local rule-based keyword mocked replies.
