@@ -85,7 +85,17 @@ The C# backend uses Entity Framework Core (Code First) to manage the database sc
 
 ---
 
-### 4. Setup Local Ollama Chatbot (Optional)
+### 4. Run Backend Tests
+The backend unit test suite is built with xUnit, NSubstitute, and FluentAssertions.
+
+To run all tests from the root of `onboarding_app`:
+```bash
+dotnet test
+```
+
+---
+
+### 5. Setup Local Ollama Chatbot (Optional)
 The chat assistant queries a local LLM to support natural language questions and onboarding task tool execution.
 
 1. **Download & Install Ollama** from [ollama.com](https://ollama.com).
