@@ -14,6 +14,40 @@ services:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       retries: 5
+    networks:
+      - onboardingapp_net
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: onboardingapp_server
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: "Host=postgres;Database=onboardingapp;Username=postgres;Password=postgres;"
+    ports:
+      - "5245:5245"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - onboardingapp_net
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: onboardingapp_client
+    ports:
+      - "3000:80"
+    depends_on:
+      - server
+    networks:
+      - onboardingapp_net
 
 volumes:
   pgdata:
+
+networks:
+  onboardingapp_net:
+    driver: bridge

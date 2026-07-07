@@ -21,13 +21,19 @@ builder.Services.AddScoped<IProgressService, ProgressService>();
 
 var app = builder.Build();
 
+// Auto-run pending EF Core migrations on startup (supports containerised deployments)
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<OnboardingDbContext>();
+    db.Database.Migrate();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseHttpsRedirection();
 }
-
-app.UseHttpsRedirection();
 
 // Map controller routes
 app.MapControllers();
